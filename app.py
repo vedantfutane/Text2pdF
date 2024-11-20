@@ -3,6 +3,10 @@ from fpdf import FPDF
 import psycopg2
 from werkzeug.security import generate_password_hash, check_password_hash
 import io
+import os
+
+DATABASE_URL = os.environ.get('DATABASE_URL')  # This gets the URL from Render's environment variable
+conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 
 app = Flask(__name__)
 app.secret_key = 'c3d4f4e8e3c1b89d33c15bbcd2e827vf'  # Set a secret key for session management
