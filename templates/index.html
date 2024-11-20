@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to PDF Converter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Text to PDF Converter</h1>
+
+    <!-- Display the logged-in username -->
+    <div>
+        <h2>Welcome, {{ username }}!</h2> <!-- Display the username -->
+    </div>
+
+    <form action="/convert" method="POST">
+        <textarea name="text" rows="10" cols="50" placeholder="Enter text here..."></textarea><br><br>
+
+        <label for="fontStyle">Font Style:</label>
+        <select name="font_style" id="fontStyle">
+            <option value="Arial">Arial</option>
+            <option value="Times">Times New Roman</option>
+            <option value="Courier">Courier</option>
+        </select><br><br>
+
+        <label for="fontSize">Font Size:</label>
+        <input type="number" name="font_size" id="fontSize" value="12" min="8" max="30"><br><br>
+
+        <label for="fontColor">Font Color:</label>
+        <input type="color" name="font_color" id="fontColor" value="#000000"><br><br>
+
+        <label><input type="checkbox" name="bold"> Bold</label>
+        <label><input type="checkbox" name="italic"> Italic</label>
+        <label><input type="checkbox" name="underline"> Underline</label><br><br>
+
+        <button type="submit">Convert to PDF</button>
+    </form>
+
+</body>
+</html>
