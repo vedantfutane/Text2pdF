@@ -14,20 +14,19 @@ import os
 import psycopg2
 
 # Database connection function
-
 def get_db_connection():
     try:
-        # Fetch the DATABASE_URL from the environment
+        # Retrieve DATABASE_URL from environment variables
         database_url = os.getenv('DATABASE_URL')
         if not database_url:
             raise ValueError("DATABASE_URL environment variable is not set!")
 
+        # Connect to the database using the URL
         conn = psycopg2.connect(database_url)
         return conn
     except Exception as e:
         print(f"Error connecting to the database: {e}")
         return None
-
 
 
 
