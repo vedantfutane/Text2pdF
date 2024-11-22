@@ -3,7 +3,7 @@ services:
     name: flask-app
     env: python
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "python app.py"
+    startCommand: "python app.app"
     plan: free
     region: us
     autoDeploy: true
