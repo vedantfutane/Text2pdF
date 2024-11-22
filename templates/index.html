@@ -4,38 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Text to PDF Converter</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="static/style.css">
+    <script src="static/script.js"></script>
 </head>
 <body>
-    <h1>Text to PDF Converter</h1>
+    <!-- Header Section -->
+    <header>
+        <h1>Text to PDF Converter</h1>
+        <h2>Welcome, Vedant!</h2>
+    </header>
 
-    <!-- Display the logged-in username -->
-    <div>
-        <h2>Welcome, {{ username }}!</h2> <!-- Display the username -->
-    </div>
-
+    <!-- Form Section -->
     <form action="/convert" method="POST">
-        <textarea name="text" rows="10" cols="50" placeholder="Enter text here..."></textarea><br><br>
+        <!-- Textarea -->
+        <label for="text">Enter Text:</label>
+        <textarea id="text" name="text" rows="6" placeholder="Enter text here..."></textarea>
 
+        <!-- Font Style -->
         <label for="fontStyle">Font Style:</label>
-        <select name="font_style" id="fontStyle">
+        <select id="fontStyle" name="font_style">
             <option value="Arial">Arial</option>
             <option value="Times">Times New Roman</option>
             <option value="Courier">Courier</option>
-        </select><br><br>
+        </select>
 
+        <!-- Font Size -->
         <label for="fontSize">Font Size:</label>
-        <input type="number" name="font_size" id="fontSize" value="12" min="8" max="30"><br><br>
+        <input id="fontSize" type="number" name="font_size" value="12" min="8" max="30">
 
+        <!-- Font Color -->
         <label for="fontColor">Font Color:</label>
-        <input type="color" name="font_color" id="fontColor" value="#000000"><br><br>
+        <input id="fontColor" type="color" name="font_color" value="#000000">
 
-        <label><input type="checkbox" name="bold"> Bold</label>
-        <label><input type="checkbox" name="italic"> Italic</label>
-        <label><input type="checkbox" name="underline"> Underline</label><br><br>
+        <!-- Style Checkboxes -->
+        <div class="checkbox-group">
+            <label><input type="checkbox" name="bold"> Bold</label>
+            <label><input type="checkbox" name="italic"> Italic</label>
+            <label><input type="checkbox" name="underline"> Underline</label>
+        </div>
 
+        <!-- Submit Button -->
         <button type="submit">Convert to PDF</button>
     </form>
 
+    <button class="logout-btn" onclick="handleLogout()">Logout</button>
+
+    <footer>
+        <p>&copy; 2024 Veda. All rights reserved.</p>
+    </footer>
+    
 </body>
 </html>

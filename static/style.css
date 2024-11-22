@@ -1,37 +1,325 @@
+/* Base Styles */
 body {
     font-family: Arial, sans-serif;
-    margin: 20px;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-h1 {
+/* Heading Styles */
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    font-size: 2.5rem;
     color: #4CAF50;
 }
 
+header h2 {
+    font-size: 1.2rem;
+    color: #666;
+    margin-top: 10px;
+}
+
+/* Form Container */
 form {
-    margin-top: 20px;
-}
-
-textarea {
+    max-width: 600px;
     width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
+    background: #ffffff;
+    padding: 25px 30px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Spacing between form elements */
 }
 
-input[type="number"],
-input[type="color"],
-select,
-button {
-    padding: 5px;
-    margin: 5px;
+/* Input Fields and Textarea */
+form input,
+form textarea,
+form select {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    color: #333;
+    background: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
 }
 
-button {
-    background-color: #4CAF50;
+form input:focus,
+form textarea:focus,
+form select:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+/* Labels */
+form label {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Checkbox Group */
+.checkbox-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap; /* Wrap checkboxes on smaller screens */
+}
+
+.checkbox-group label {
+    font-size: 0.9rem;
+    font-weight: normal;
+}
+
+/* Button Styles */
+form button {
+    padding: 12px;
+    font-size: 1rem;
     color: white;
+    background-color: #4CAF50;
     border: none;
+    border-radius: 5px;
     cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-button:hover {
+form button:hover {
     background-color: #45a049;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    form {
+        padding: 20px;
+    }
+
+    form button,
+    form input,
+    form select,
+    form textarea {
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+
+    header h1 {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    form {
+        padding: 15px;
+    }
+
+    form button,
+    form input,
+    form select,
+    form textarea {
+        font-size: 0.85rem;
+        padding: 8px;
+    }
+
+    header h1 {
+        font-size: 1.8rem;
+    }
+}
+
+
+/* General Styles for Form Inputs */
+form input,
+form textarea,
+form select {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    color: #333;
+    background: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+/* Specific Styles for Color Picker */
+form input[type="color"] {
+    width: 100%; /* Full width for consistency */
+    height: 45px; /* Match height of other input fields */
+    border: 1px solid #ccc; /* Add border to match others */
+    border-radius: 5px; /* Rounded corners for consistency */
+    padding: 5px; /* Padding to add space inside */
+    background: #fff; /* White background */
+    cursor: pointer; /* Show pointer cursor on hover */
+}
+
+/* Focus State for All Inputs */
+form input:focus,
+form textarea:focus,
+form select:focus,
+form input[type="color"]:focus {
+    outline: none;
+    border-color: #4CAF50; /* Highlight border on focus */
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+/* Responsive Design for Smaller Screens */
+@media (max-width: 768px) {
+    form input,
+    form textarea,
+    form select {
+        width: 100%; /* Inputs take full width */
+    }
+    form input[type="color"] {
+        width: 100%; /* Ensure consistency on small screens */
+    }
+}
+/* Mobile-Responsive Styles for Small Screens (max-width: 480px) */
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+
+    header h1 {
+        font-size: 1.8rem;
+    }
+
+    header h2 {
+        font-size: 1rem;
+        margin-top: 5px;
+    }
+
+    form {
+        padding: 15px;
+        border-radius: 8px;
+    }
+
+    /* Adjust Input, Textarea, and Select Width and Spacing */
+    form input,
+    form textarea,
+    form select,
+    form input[type="color"] {
+        font-size: 0.85rem;
+        padding: 10px;
+        height: auto; /* Ensure proper sizing */
+    }
+
+    form textarea {
+        height: 80px; /* Smaller height for mobile */
+    }
+
+    /* Adjust Checkbox Group */
+    .checkbox-group {
+        flex-direction: column;
+        gap: 5px;
+        align-items: flex-start; /* Align checkboxes to the left */
+    }
+
+    .checkbox-group label {
+        font-size: 0.85rem;
+    }
+
+    /* Adjust Button Size */
+    form button {
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+
+    /* Ensure Consistent Font Color Picker Styling */
+    form input[type="color"] {
+        height: 40px; /* Slightly smaller height */
+        padding: 0;
+    }
+
+    /* Adjust Form Label Sizes */
+    form label {
+        font-size: 0.9rem;
+    }
+
+    /* Form Box Shadow Reduced */
+    form {
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Reduce Gap Between Form Elements */
+    form {
+        gap: 10px;
+    }
+
+    /* Button Hover Effect for Touch Devices */
+    form button:hover {
+        background-color: #3e8e41;
+    }
+}
+
+/* Logout Button - Default Styles */
+.logout-btn {
+    position: absolute; /* Fixed at the top-right corner */
+    top: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: white;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10; /* Ensures it stays on top of other elements */
+}
+
+.logout-btn:hover {
+    background-color: #45a049;
+}
+
+/* Responsive Logout Button for Tablet Screens (<=768px) */
+@media (max-width: 768px) {
+    .logout-btn {
+        top: 15px; /* Adjusted top position */
+        right: 15px; /* Adjusted right position */
+        font-size: 0.9rem;
+        padding: 8px 15px;
+    }
+}
+
+/* Responsive Logout Button for Mobile Screens (<=480px) */
+@media (max-width: 480px) {
+    .logout-btn {
+        position: static; /* Places the button inline for better layout */
+        margin: 10px auto; /* Centers the button horizontally */
+        display: block;
+        width: 90%; /* Makes the button fill most of the width */
+        font-size: 1rem; /* Maintain a readable font size */
+        padding: 12px; /* Increase padding for easier tapping */
+        text-align: center; /* Centers text */
+    }
+}
+
+
+footer {
+    text-align: center;
+    padding: 15px 0;
+    color: #666; /* Darker grey text */
+    font-size: 0.9rem;
+    width: 100%; /* Full width */
+    bottom: 0; /* Align at the bottom */
+    left: 0; /* Align to the left edge */
+}
+
+@media (max-width: 768px) {
+    footer {
+        font-size: 0.8rem; /* Slightly smaller text for smaller screens */
+    }
 }

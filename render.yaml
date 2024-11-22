@@ -3,10 +3,12 @@ services:
     name: flask-app
     env: python
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn app:app"  # Replace "app" with your main file name
-    plan: free  # You can change this to another plan if needed
+    startCommand: "python app.py"
+    plan: free
+    region: us
+    autoDeploy: true
 
 databases:
   - name: postgres-db
     plan: free
-    databaseName: flaskdb  # Replace with your desired database name
+    databaseName: flaskdb

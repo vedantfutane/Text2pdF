@@ -5,22 +5,31 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import io
 import os
 
-DATABASE_URL = os.environ.get('DATABASE_URL')  # This gets the URL from Render's environment variable
-conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 
 app = Flask(__name__)
 app.secret_key = 'c3d4f4e8e3c1b89d33c15bbcd2e827vf'  # Set a secret key for session management
 
 # Database connection
+import os
+import psycopg2
+
+# Database connection function
 def get_db_connection():
-    print("Opening new DB connection")
-    conn = psycopg2.connect(
-        host="localhost",
-        database="testdb1",
-        user="postgres",
-        password="Vedant@123"
-    )
-    return conn
+    try:
+        # Use the environment variable DATABASE_URL to connect
+        conn = psycopg2.connect(
+            host="localhost",  # Use your database's host, for Render use DATABASE_URL
+            database="testdb1",  # Database name
+            user="postgres",  # Database user
+            password="Vedant@123"  # Database password
+        )
+        return conn
+
+    except Exception as e:
+        print(f"Error connecting to the database: {e}")
+        return None
+
+
 
 
 class PDF(FPDF):
@@ -148,19 +157,19 @@ def convert_to_pdf():
         conn = get_db_connection()  # Open a new connection
         cur = conn.cursor()
 
-        # Check if user_id is correctly set in the session
+        # Get user_id from session
         user_id = session.get('user_id')
         print(f"User ID (from session): {user_id}")  # Debugging message
 
-        # Check if user_id is None
-        if user_id is None:
+        if not user_id:
             print("User ID is None! Cannot insert PDF.")  # Debugging message
             flash("You need to log in first.")
             return redirect(url_for('login'))
-        
-        cur.execute("SELECT username FROM users WHERE id = %s", (session['user_id'],))
+
+        # Ensure username is fetched correctly before inserting the PDF
+        cur.execute("SELECT username FROM users WHERE id = %s", (user_id,))
         user = cur.fetchone()
-        
+
         if user:
             username = user[0]  # Assign the fetched username
         else:
@@ -187,6 +196,7 @@ def convert_to_pdf():
     response.headers["Content-Type"] = "application/pdf"
     response.headers["Content-Disposition"] = "attachment; filename=text_to_pdf.pdf"
     return response
+
 
 if __name__ == '__main__':
     app.run(debug=True)
