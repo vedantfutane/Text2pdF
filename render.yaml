@@ -2,11 +2,13 @@ services:
   - type: web
     name: flask-app
     env: python
+    pythonVersion: 3.10
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "python app.app"
+    startCommand: "gunicorn app:app"
     plan: free
     region: us
     autoDeploy: true
+
 
 databases:
   - name: postgres-db
