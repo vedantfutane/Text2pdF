@@ -14,17 +14,16 @@ import os
 import psycopg2
 
 # Database connection function
+
 def get_db_connection():
     try:
-        # Use the environment variable DATABASE_URL to connect
-        conn = psycopg2.connect(
-            host="localhost",  # Use your database's host, for Render use DATABASE_URL
-            database="testdb1",  # Database name
-            user="postgres",  # Database user
-            password="Vedant@123"  # Database password
-        )
-        return conn
+        # Fetch the DATABASE_URL from the environment
+        database_url = os.getenv('DATABASE_URL')
+        if not database_url:
+            raise ValueError("DATABASE_URL environment variable is not set!")
 
+        conn = psycopg2.connect(database_url)
+        return conn
     except Exception as e:
         print(f"Error connecting to the database: {e}")
         return None

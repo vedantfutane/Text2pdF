@@ -1,16 +1,42 @@
-services:
-  - type: web
-    name: flask-app
-    env: python
-    pythonVersion: 3.12
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn app:app"
-    plan: free
-    region: us
-    autoDeploy: true
+# services:
+#   - type: web
+#     name: flask-app
+#     env: python
+#     pythonVersion: 3.12
+#     buildCommand: "pip install -r requirements.txt"
+#     startCommand: "gunicorn app:app"
+#     plan: free
+#     region: us
+#     autoDeploy: true
 
 
+# databases:
+#   - name: postgres-db
+#     plan: free
+#     databaseName: flaskdb
+
+
+
+
+# Exported from Render on 2024-11-22T17:39:12Z
 databases:
-  - name: postgres-db
-    plan: free
-    databaseName: flaskdb
+- name: Text2pdf_PostgreSQL
+  databaseName: text2pdf_postgresql
+  user: text2pdf_postgresql_user
+  plan: free
+  region: oregon
+  ipAllowList:
+  - source: 0.0.0.0/0
+    description: everywhere
+  postgresMajorVersion: "16"
+services:
+- type: web
+  name: Text2pdF
+  runtime: python
+  repo: https://github.com/vedantfutane/Text2pdF
+  plan: free
+  region: oregon
+  buildCommand: pip install -r requirements.txt
+  startCommand: gunicorn app:app
+version: "1"
+
