@@ -14,8 +14,6 @@
         <!-- Displaying username dynamically -->
         {% if username %}
             <h2>Welcome, {{ username }}!</h2>  <!-- Flask will inject the username here -->
-        {% else %}
-            <h2>Welcome, Guest!</h2>  <!-- If no username, display "Guest" -->
         {% endif %}
     </header>
 

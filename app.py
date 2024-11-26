@@ -76,6 +76,10 @@ def register():
 # Login route
 @app.route('/login', methods=["GET", "POST"])
 def login():
+    # If user is already logged in, redirect to the main page
+    if 'user_id' in session:
+        return redirect(url_for('index'))  # Redirect to the index page
+
     if request.method == "POST":
         username = request.form['username']
         password = request.form['password']
@@ -84,13 +88,17 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user:
             if check_password_hash(user.password, password):
+                # Store user ID in session to indicate the user is logged in
                 session['user_id'] = user.id
-                return redirect(url_for('index'))
+                flash("Login successful!", "success")
+                return redirect(url_for('index'))  # Redirect to the main page
             else:
                 flash("Invalid credentials, please try again.", "danger")
         else:
             flash("Invalid credentials, please try again.", "danger")
+
     return render_template("login.html")
+
 
 
 # Home route
@@ -98,11 +106,11 @@ def login():
 def index():
     # Check if the user is logged in (i.e., check if 'user_id' exists in the session)
     if 'user_id' not in session:
-        # If the user is not logged in, redirect to the login page
-        return redirect(url_for('login'))
+        return redirect(url_for('login'))  # Redirect to login page
     
     # If the user is logged in, render the main page
     return render_template('index.html')
+
 
 # Convert to PDF route
 # Define the PDF generator class
