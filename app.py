@@ -89,6 +89,13 @@ def index():
     return render_template("index.html", username=username)
 
 # Convert to PDF route
+# Define the PDF generator class
+class PDF(FPDF):
+    def header(self):
+        self.set_font("Arial", size=12)
+        self.cell(0, 10, "Text to PDF Conversion", ln=True, align="C")
+
+# Convert to PDF route
 @app.route('/convert', methods=["POST"])
 def convert_to_pdf():
     if 'user_id' not in session:
@@ -99,20 +106,39 @@ def convert_to_pdf():
     font_size = int(request.form.get("font_size", 12))
     font_color = request.form.get("font_color", "#000000")
 
+    # Check for selected styles
+    bold = 'bold' in request.form
+    italic = 'italic' in request.form
+    underline = 'underline' in request.form
+
+    # Replace quotes
     text = text.replace("’", "'").replace("“", '"').replace("”", '"')
     font_color_rgb = tuple(int(font_color.lstrip("#")[i:i+2], 16) for i in (0, 2, 4))
 
-    # Generate the PDF
+    # Create the PDF
     pdf = PDF()
     pdf.add_page()
     pdf.set_text_color(*font_color_rgb)
     pdf.set_font(font_style, size=font_size)
+
+    # Apply styles based on user input
+    styles = ''
+    if bold:
+        styles += 'B'
+    if italic:
+        styles += 'I'
+    if underline:
+        styles += 'U'
+
+    pdf.set_font(font_style, style=styles)
+
+    # Write the styled text to the PDF
     pdf.multi_cell(0, 10, text)
 
+    # Save PDF to database (optional step)
     pdf_output = pdf.output(dest="S").encode("latin1")
     user = User.query.get(session['user_id'])
 
-    # Save the PDF file to the database
     try:
         new_pdf = PDFFile(
             file_name="text_to_pdf.pdf",
@@ -127,11 +153,12 @@ def convert_to_pdf():
         db.session.rollback()
         flash(f"Error saving PDF file: {e}", "danger")
 
-    # Send the PDF as a response
+    # Return the PDF file to the user
     response = make_response(pdf_output)
     response.headers["Content-Type"] = "application/pdf"
     response.headers["Content-Disposition"] = "attachment; filename=text_to_pdf.pdf"
     return response
+
 
 # Logout route
 @app.route('/logout')
