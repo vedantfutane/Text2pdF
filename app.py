@@ -1,35 +1,38 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, make_response
 from fpdf import FPDF
-import psycopg2
 from werkzeug.security import generate_password_hash, check_password_hash
-import io
-import os
-
-
-app = Flask(__name__)
-app.secret_key = 'c3d4f4e8e3c1b89d33c15bbcd2e827vf'  # Set a secret key for session management
-
-# Database connection
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 import os
 import psycopg2
 
-# Database connection function
-def get_db_connection():
-    try:
-        # Retrieve DATABASE_URL from environment variables
-        database_url = os.getenv('DATABASE_URL')
-        if not database_url:
-            raise ValueError("DATABASE_URL environment variable is not set!")
+# Flask app setup
+app = Flask(__name__)
+app.secret_key = os.getenv('SECRET_KEY', 'default_secret_key')  # Secure the secret key
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-        # Connect to the database using the URL
-        conn = psycopg2.connect(database_url)
-        return conn
-    except Exception as e:
-        print(f"Error connecting to the database: {e}")
-        return None
+# Initialize database and migration
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
+# Define the database models
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
 
+class PDFFile(db.Model):
+    __tablename__ = 'pdf_files'
+    id = db.Column(db.Integer, primary_key=True)
+    file_name = db.Column(db.String(100), nullable=False)
+    file_data = db.Column(db.LargeBinary, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    username = db.Column(db.String(50), nullable=False)
 
+# Define the PDF generator class
 class PDF(FPDF):
     def header(self):
         self.set_font("Arial", size=12)
@@ -43,24 +46,18 @@ def register():
         email = request.form['email']
         password = request.form['password']
         hashed_password = generate_password_hash(password)
-        
-        conn = get_db_connection()
-        cur = conn.cursor()
-        
+
+        # Add new user to the database
         try:
-            # Insert user data into the database
-            cur.execute("INSERT INTO users (username, email, password) VALUES (%s, %s, %s)", 
-                        (username, email, hashed_password))
-            conn.commit()
-            flash("Registration successful! Please log in.")
+            new_user = User(username=username, email=email, password=hashed_password)
+            db.session.add(new_user)
+            db.session.commit()
+            flash("Registration successful! Please log in.", "success")
             return redirect(url_for('login'))
         except Exception as e:
-            conn.rollback()
-            flash(f"Error: {e}")
-        finally:
-            cur.close()
-            conn.close()
-        
+            db.session.rollback()
+            flash(f"Error: {e}", "danger")
+    
     return render_template("register.html")
 
 # Login route
@@ -69,132 +66,79 @@ def login():
     if request.method == "POST":
         username = request.form['username']
         password = request.form['password']
-        
-        conn = get_db_connection()
-        cur = conn.cursor()
-        
-        cur.execute("SELECT * FROM users WHERE username = %s", (username,))
-        user = cur.fetchone()
-        
-        if user and check_password_hash(user[3], password):  # user[3] is the password
-            session['user_id'] = user[0]  # Store user ID in the session
-            flash("Login successful!")
-            return redirect(url_for('index'))  # Redirect to home page after login
+
+        # Verify user credentials
+        user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password, password):
+            session['user_id'] = user.id
+            flash("Login successful!", "success")
+            return redirect(url_for('index'))
         else:
-            flash("Invalid credentials, please try again.")
-        
-        cur.close()
-        conn.close()
-    
+            flash("Invalid credentials, please try again.", "danger")
+
     return render_template("login.html")
 
-# Home page (protected route)
+# Home route
 @app.route('/')
 def index():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     
-    # Get the username of the logged-in user
-    username = None
-    try:
-        conn = get_db_connection()  # Open the connection
-        
-        cur = conn.cursor()
-        cur.execute("SELECT username FROM users WHERE id = %s", (session['user_id'],))
-        user = cur.fetchone()
-        
-        if user:
-            username = user[0]  # Assign the fetched username
-        else:
-            username = "Unknown User"
-        
-        cur.close()  # Close the cursor after the query
-    except Exception as e:
-        print(f"Error: {e}")
-        username = "Error retrieving username"
-    finally:
-        # Ensure that the connection is closed after the query is completed
-        if conn:
-            conn.close()
-    
+    user = User.query.get(session['user_id'])
+    username = user.username if user else "Unknown User"
     return render_template("index.html", username=username)
 
-# Convert to PDF route (protected)
+# Convert to PDF route
 @app.route('/convert', methods=["POST"])
 def convert_to_pdf():
     if 'user_id' not in session:
-        print("No user logged in!")  # Debugging message
         return redirect(url_for('login'))
 
-    # Get form inputs
     text = request.form.get("text", "")
     font_style = request.form.get("font_style", "Arial")
     font_size = int(request.form.get("font_size", 12))
     font_color = request.form.get("font_color", "#000000")
 
-    # Replace unsupported characters
     text = text.replace("’", "'").replace("“", '"').replace("”", '"')
-
-    # Convert hex color to RGB
     font_color_rgb = tuple(int(font_color.lstrip("#")[i:i+2], 16) for i in (0, 2, 4))
 
-    # Create PDF
+    # Generate the PDF
     pdf = PDF()
     pdf.add_page()
     pdf.set_text_color(*font_color_rgb)
     pdf.set_font(font_style, size=font_size)
     pdf.multi_cell(0, 10, text)
 
-    # Output PDF for download
     pdf_output = pdf.output(dest="S").encode("latin1")
+    user = User.query.get(session['user_id'])
 
-    username = None
-
+    # Save the PDF file to the database
     try:
-        # Open a new connection for saving PDF file data to the database
-        conn = get_db_connection()  # Open a new connection
-        cur = conn.cursor()
-
-        # Get user_id from session
-        user_id = session.get('user_id')
-        print(f"User ID (from session): {user_id}")  # Debugging message
-
-        if not user_id:
-            print("User ID is None! Cannot insert PDF.")  # Debugging message
-            flash("You need to log in first.")
-            return redirect(url_for('login'))
-
-        # Ensure username is fetched correctly before inserting the PDF
-        cur.execute("SELECT username FROM users WHERE id = %s", (user_id,))
-        user = cur.fetchone()
-
-        if user:
-            username = user[0]  # Assign the fetched username
-        else:
-            username = "Unknown User"
-
-        # Insert PDF file data into the database
-        cur.execute("INSERT INTO pdf_files (file_name, file_data, user_id, username) VALUES (%s, %s, %s, %s)", 
-                    ("text_to_pdf.pdf", pdf_output, user_id, username))
-
-        # Commit the transaction
-        conn.commit()
-        print("PDF file saved to database successfully.")  # Debugging message
-
-        # Close the cursor and connection
-        cur.close()
-        conn.close()
-
+        new_pdf = PDFFile(
+            file_name="text_to_pdf.pdf",
+            file_data=pdf_output,
+            user_id=user.id,
+            username=user.username
+        )
+        db.session.add(new_pdf)
+        db.session.commit()
+        flash("PDF file saved successfully!", "success")
     except Exception as e:
-        print(f"Error: {e}")  # Debugging message
-        flash("Error saving PDF file to database.")
+        db.session.rollback()
+        flash(f"Error saving PDF file: {e}", "danger")
 
-    # Send the PDF file to the user as a response
+    # Send the PDF as a response
     response = make_response(pdf_output)
     response.headers["Content-Type"] = "application/pdf"
     response.headers["Content-Disposition"] = "attachment; filename=text_to_pdf.pdf"
     return response
 
+# Logout route
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash("You have been logged out.", "info")
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
     app.run(debug=True)
