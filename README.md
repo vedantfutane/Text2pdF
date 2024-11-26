@@ -35,7 +35,7 @@
 
 The **Text2PDF** application is deployed and live on [Render](https://render.com/). You can access the live demo at the following URL:
 
-[Text2PDF Live Demo](https://text2pdf-4vyx.onrender.com) *(Replace with actual URL once deployed)*
+[Text2PDF Live Demo](https://text2pdf-4vyx.onrender.com)
 
 You can test the application directly by visiting the link, where you can input your text, customize the styling, and convert it to a PDF.
 

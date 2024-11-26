@@ -96,12 +96,13 @@ def login():
 # Home route
 @app.route('/')
 def index():
+    # Check if the user is logged in (i.e., check if 'user_id' exists in the session)
     if 'user_id' not in session:
+        # If the user is not logged in, redirect to the login page
         return redirect(url_for('login'))
     
-    user = User.query.get(session['user_id'])
-    username = user.username if user else "Unknown User"
-    return render_template("index.html", username=username)
+    # If the user is logged in, render the main page
+    return render_template('index.html')
 
 # Convert to PDF route
 # Define the PDF generator class
