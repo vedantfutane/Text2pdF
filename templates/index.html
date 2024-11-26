@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text to PDF Converter</title>
+    <title>Text2PDF</title>
     <link rel="stylesheet" href="static/style.css">
     <script src="static/script.js"></script>
 </head>
@@ -11,7 +11,12 @@
     <!-- Header Section -->
     <header>
         <h1>Text to PDF Converter</h1>
-        <h2>Welcome, Vedant!</h2>
+        <!-- Displaying username dynamically -->
+        {% if username %}
+            <h2>Welcome, {{ username }}!</h2>  <!-- Flask will inject the username here -->
+        {% else %}
+            <h2>Welcome, Guest!</h2>  <!-- If no username, display "Guest" -->
+        {% endif %}
     </header>
 
     <!-- Form Section -->
@@ -50,7 +55,7 @@
     <button class="logout-btn" onclick="handleLogout()">Logout</button>
 
     <footer>
-        <p>&copy; 2024 Veda. All rights reserved.</p>
+        <p>&copy; 2024 Text2PDF Veda. All rights reserved.</p>  <!-- Changed footer text to Text2PDF -->
     </footer>
     
 </body>

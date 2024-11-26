@@ -47,8 +47,20 @@ def register():
         password = request.form['password']
         hashed_password = generate_password_hash(password)
 
-        # Add new user to the database
+        # Check if the username or email already exists
+        existing_user_by_username = User.query.filter_by(username=username).first()
+        existing_user_by_email = User.query.filter_by(email=email).first()
+
+        if existing_user_by_username:
+            flash("Username already exists. Please choose a different one.", "danger")
+            return redirect(url_for('register'))
+
+        if existing_user_by_email:
+            flash("Email already exists. Please use a different one.", "danger")
+            return redirect(url_for('register'))
+
         try:
+            # Add new user to the database
             new_user = User(username=username, email=email, password=hashed_password)
             db.session.add(new_user)
             db.session.commit()
@@ -60,6 +72,7 @@ def register():
     
     return render_template("register.html")
 
+
 # Login route
 @app.route('/login', methods=["GET", "POST"])
 def login():
@@ -69,14 +82,16 @@ def login():
 
         # Verify user credentials
         user = User.query.filter_by(username=username).first()
-        if user and check_password_hash(user.password, password):
-            session['user_id'] = user.id
-            flash("Login successful!", "success")
-            return redirect(url_for('index'))
+        if user:
+            if check_password_hash(user.password, password):
+                session['user_id'] = user.id
+                return redirect(url_for('index'))
+            else:
+                flash("Invalid credentials, please try again.", "danger")
         else:
             flash("Invalid credentials, please try again.", "danger")
-
     return render_template("login.html")
+
 
 # Home route
 @app.route('/')
@@ -93,7 +108,7 @@ def index():
 class PDF(FPDF):
     def header(self):
         self.set_font("Arial", size=12)
-        self.cell(0, 10, "Text to PDF Conversion", ln=True, align="C")
+        self.cell(0, 10, "Text2PDF Conversion", ln=True, align="C")
 
 # Convert to PDF route
 @app.route('/convert', methods=["POST"])
@@ -147,11 +162,12 @@ def convert_to_pdf():
             username=user.username
         )
         db.session.add(new_pdf)
-        db.session.commit()
-        flash("PDF file saved successfully!", "success")
+        
     except Exception as e:
         db.session.rollback()
         flash(f"Error saving PDF file: {e}", "danger")
+
+        db.session.commit()
 
     # Return the PDF file to the user
     response = make_response(pdf_output)
@@ -163,9 +179,13 @@ def convert_to_pdf():
 # Logout route
 @app.route('/logout')
 def logout():
+    # Clear the session to log out the user
     session.clear()
+    # Flash message indicating logout
     flash("You have been logged out.", "info")
+    # Redirect to the login page
     return redirect(url_for('login'))
+
 
 if __name__ == '__main__':
     app.run(debug=True)

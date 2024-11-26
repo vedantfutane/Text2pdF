@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
+    <title>Register - Text2PDF</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <header>
-        <h1>Register</h1>
+        <h1>Text2PDF</h1> <!-- Updated heading -->
     </header>
 
     <main>
+        <!-- Welcome message -->
+        <h2>Create account</h2> <!-- Added heading here -->
+
         {% with messages = get_flashed_messages() %}
         {% if messages %}
             <div class="flash-messages">
@@ -24,13 +27,13 @@
 
         <form action="{{ url_for('register') }}" method="POST">
             <label for="username">Username</label>
-            <input type="text" id="username" name="username" required><br><br>
+            <input type="text" id="username" name="username" placeholder="Username" required><br><br>
             
             <label for="email">Email</label>
-            <input type="email" id="email" name="email" required><br><br>
+            <input type="email" id="email" name="email" placeholder="example@domain.com" required><br><br>
             
             <label for="password">Password</label>
-            <input type="password" id="password" name="password" required><br><br>
+            <input type="password" id="password" name="password" placeholder="Password" required><br><br>
             
             <button type="submit">Register</button>
         </form>
