@@ -71,12 +71,8 @@ The app will be running on http://127.0.0.1:5000/. You can visit this URL in you
 **Logout**: After using the application, users can log out securely. The logout button is positioned at the top-right and is responsive, adjusting its position on smaller screens.
 
 ## Screenshots
-![Registeration](./templates/assets/Register.png)
-![Login](./templates/assets/Login.png)
 ![Main Dasboard of Text2PDF](./templates/assets/Main_Page.png)
 
-
-## Mobile view of the form.
 
 ### Contributing
 We welcome contributions to improve the project! If you have suggestions or find issues, feel free to fork the repository, make changes, and submit a pull request.
