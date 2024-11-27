@@ -13,7 +13,9 @@
         <h1>Text to PDF Converter</h1>
         <!-- Displaying username dynamically -->
         {% if username %}
-            <h2>Welcome, {{ username }}!</h2>  <!-- Flask will inject the username here -->
+            <h2>Welcome, {{ username }}!</h2>
+        {% else %}
+            <h2>Welcome!</h2>
         {% endif %}
     </header>
 
@@ -50,7 +52,7 @@
         <button type="submit">Convert to PDF</button>
     </form>
 
-    <button class="logout-btn" onclick="handleLogout()">Logout</button>
+    <a href="/logout" class="logout-btn" onclick="return confirmLogout();">Logout</a>
 
     <footer>
         <p>&copy; 2024 Text2PDF Veda. All rights reserved.</p>  <!-- Changed footer text to Text2PDF -->

@@ -76,43 +76,41 @@ def register():
 # Login route
 @app.route('/login', methods=["GET", "POST"])
 def login():
-    # If user is already logged in, redirect to the main page
     if 'user_id' in session:
-        return redirect(url_for('index'))  # Redirect to the index page
-
+        return redirect(url_for('index'))
+    
     if request.method == "POST":
         username = request.form['username']
         password = request.form['password']
-
-        # Verify user credentials
+        
         user = User.query.filter_by(username=username).first()
-        if user:
-            if check_password_hash(user.password, password):
-                # Store user ID in session to indicate the user is logged in
-                session['user_id'] = user.id
-                flash("Login successful!", "success")
-                return redirect(url_for('index'))  # Redirect to the main page
-            else:
-                flash("Invalid credentials, please try again.", "danger")
+        if user and check_password_hash(user.password, password):
+            session['user_id'] = user.id  # Store user ID in the session
+            flash("Login successful!", "success")
+            return redirect(url_for('index'))
         else:
-            flash("Invalid credentials, please try again.", "danger")
-
-    return render_template("login.html")
+            flash("Invalid credentials. Please try again.", "danger")
+    
+    return render_template('login.html')
 
 
 
 # Home route
 @app.route('/')
 def index():
-    # Check if the user is logged in (i.e., check if 'user_id' exists in the session)
+    # Check if the user is logged in
     if 'user_id' not in session:
-        return redirect(url_for('login'))  # Redirect to login page
+        flash("Please log in to access this page.", "warning")
+        return redirect(url_for('login'))
     
-    # If the user is logged in, render the main page
-    return render_template('index.html')
+    # Retrieve the username of the logged-in user
+    user = User.query.get(session['user_id'])
+    if user:
+        return render_template('index.html', username=user.username)
+    else:
+        flash("User not found. Please log in again.", "danger")
+        return redirect(url_for('login'))
 
-
-# Convert to PDF route
 # Define the PDF generator class
 class PDF(FPDF):
     def header(self):
@@ -164,6 +162,7 @@ def convert_to_pdf():
     user = User.query.get(session['user_id'])
 
     try:
+        # Create a new PDFFile record
         new_pdf = PDFFile(
             file_name="text_to_pdf.pdf",
             file_data=pdf_output,
@@ -171,13 +170,12 @@ def convert_to_pdf():
             username=user.username
         )
         db.session.add(new_pdf)
-        
+        db.session.commit()  # Save to the database
+
     except Exception as e:
         db.session.rollback()
         flash(f"Error saving PDF file: {e}", "danger")
-
-        db.session.commit()
-
+    
     # Return the PDF file to the user
     response = make_response(pdf_output)
     response.headers["Content-Type"] = "application/pdf"
@@ -188,12 +186,10 @@ def convert_to_pdf():
 # Logout route
 @app.route('/logout')
 def logout():
-    # Clear the session to log out the user
     session.clear()
-    # Flash message indicating logout
-    flash("You have been logged out.", "info")
-    # Redirect to the login page
+    print("Session after clearing:", session)  # Debug log
     return redirect(url_for('login'))
+
 
 
 if __name__ == '__main__':
