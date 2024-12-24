@@ -20,9 +20,9 @@
 
 # Exported from Render on 2024-11-22T17:39:12Z
 databases:
-- name: Text2pdf_PostgreSQL
-  databaseName: text2pdf_postgresql
-  user: text2pdf_postgresql_user
+- name: Text2pdf_Database
+  databaseName: text2pdf_database
+  user: text2pdf_database_user
   plan: free
   region: oregon
   ipAllowList:
