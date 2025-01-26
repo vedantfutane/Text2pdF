@@ -9,7 +9,7 @@ import psycopg2
 # Flask app setup
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'c3d4f4e8e3c1b89d33c15bbcd2e827vf')  # Secure the secret key
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL','postgresql://text2pdf_database_user:g2D7U2aB2yRAi99PoxqALJxaGmYAt3wk@dpg-ctl3fk5umphs73d6v680-a.oregon-postgres.render.com/text2pdf_database')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL','postgresql://text2pdf_postgresql_916r_user:FIWyuuM29wN7wiqGOHPdGK5SVtAWe2CL@dpg-cub4d9rtq21c73cguc30-a.oregon-postgres.render.com/text2pdf_postgresql_916r') #external db from render
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize database and migration
